@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import {
   baseRoutePaths,
   protectedRoutePaths,
@@ -18,8 +18,11 @@ function AppRoutes() {
           ))}
         </Route>
 
-        {/* Directly load app layout, no auth check */}
-        <Route path="/" element={<AppLayout />}>
+        {/* Default redirect from "/" → /workspace/default */}
+        <Route path="/" element={<Navigate to="/workspace/default" replace />} />
+
+        {/* App Layout (no auth) */}
+        <Route element={<AppLayout />}>
           {protectedRoutePaths.map((route) => (
             <Route
               key={route.path}
