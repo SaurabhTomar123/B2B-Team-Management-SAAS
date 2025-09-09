@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import ProtectedRoute from "./protected.route";
 import AuthRoute from "./auth.route";
 import {
@@ -11,6 +11,8 @@ import BaseLayout from "@/layout/base.layout";
 import NotFound from "@/page/errors/NotFound";
 
 function AppRoutes() {
+  const disableAuth = import.meta.env.VITE_DISABLE_AUTH === "true";
+
   return (
     <BrowserRouter>
       <Routes>
@@ -20,17 +22,23 @@ function AppRoutes() {
           ))}
         </Route>
 
-        <Route path="/" element={<AuthRoute />}>
-          <Route element={<BaseLayout />}>
-            {authenticationRoutePaths.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
+        {/* 🔥 If auth is disabled, skip login and redirect */}
+        {!disableAuth && (
+          <Route path="/" element={<AuthRoute />}>
+            <Route element={<BaseLayout />}>
+              {authenticationRoutePaths.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={route.element}
+                />
+              ))}
+            </Route>
           </Route>
-        </Route>
+        )}
+        {disableAuth && (
+          <Route path="/sign-in" element={<Navigate to="/" replace />} />
+        )}
 
         {/* Protected Route */}
         <Route path="/" element={<ProtectedRoute />}>
@@ -44,6 +52,7 @@ function AppRoutes() {
             ))}
           </Route>
         </Route>
+
         {/* Catch-all for undefined routes */}
         <Route path="*" element={<NotFound />} />
       </Routes>
