@@ -4,6 +4,12 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { isAuthRoute } from "./common/routePaths";
 
 const AuthRoute = () => {
+  const disableAuth = import.meta.env.VITE_DISABLE_AUTH === "true";
+
+  if (disableAuth) {
+    return <Outlet />;
+  }
+
   const location = useLocation();
   const { data: authData, isLoading } = useAuth();
   const user = authData?.user;
