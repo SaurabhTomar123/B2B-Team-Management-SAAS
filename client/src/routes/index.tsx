@@ -1,8 +1,5 @@
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import ProtectedRoute from "./protected.route";
-import AuthRoute from "./auth.route";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import {
-  authenticationRoutePaths,
   baseRoutePaths,
   protectedRoutePaths,
 } from "./common/routes";
@@ -11,49 +8,28 @@ import BaseLayout from "@/layout/base.layout";
 import NotFound from "@/page/errors/NotFound";
 
 function AppRoutes() {
-  const disableAuth = import.meta.env.VITE_DISABLE_AUTH === "true";
-
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public/Base Routes */}
         <Route element={<BaseLayout />}>
           {baseRoutePaths.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
 
-        {/* 🔥 If auth is disabled, skip login and redirect */}
-        {!disableAuth && (
-          <Route path="/" element={<AuthRoute />}>
-            <Route element={<BaseLayout />}>
-              {authenticationRoutePaths.map((route) => (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={route.element}
-                />
-              ))}
-            </Route>
-          </Route>
-        )}
-        {disableAuth && (
-          <Route path="/sign-in" element={<Navigate to="/" replace />} />
-        )}
-
-        {/* Protected Route */}
-        <Route path="/" element={<ProtectedRoute />}>
-          <Route element={<AppLayout />}>
-            {protectedRoutePaths.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={route.element}
-              />
-            ))}
-          </Route>
+        {/* Directly load app layout, no auth check */}
+        <Route path="/" element={<AppLayout />}>
+          {protectedRoutePaths.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={route.element}
+            />
+          ))}
         </Route>
 
-        {/* Catch-all for undefined routes */}
+        {/* Catch-all */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
